@@ -1,3 +1,5 @@
+import { lerp } from '$lib/mathfn';
+
 export class PathManager {
     constructor(grid, player) {
         this.grid = grid;
@@ -31,7 +33,6 @@ export class PathManager {
         
         for (let i = 1; i < this.path.length; i++) {
             let cellPos = this.grid.getCellCenter(this.pathCells[i].row, this.pathCells[i].col);
-
             ctx.lineTo(
                 cellPos.x,
                 cellPos.y

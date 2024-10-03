@@ -7,6 +7,7 @@
     import { PathManager } from '$lib/pathmanager';
     import { astar } from '$lib/astar';
     import { lerp } from '$lib/mathfn';
+    import { Timer } from '$lib/timer';
 
 
     
@@ -20,7 +21,9 @@
     let gridEnd = { x: 0, y: 0 };
 
 
-    let t = 0;
+    let timer = new Timer(2);
+
+    // let t = 0;
     let pathIndex = 0;
 
 
@@ -59,7 +62,7 @@
         // If there is a path to follow
         if(pathManager.path.length > 1) {
 
-            console.log('t: ',t.toFixed(2));   
+            console.log('t: ',timer.t.toFixed(2));   
             console.log('Path index: ',pathIndex);
 
             // Update the start and target cells
@@ -68,10 +71,8 @@
             console.log('Start: ',start);
             console.log('Target: ',target);
 
-
-
             // When the timer is at 0, calculate the difference between the start and target, relative to the grid
-            if(t === 0)
+            if(timer.t === 0)
             {
                 let dif = { x: (target.x - start.x) * -1, y: (target.y - start.y) * -1 };
                 gridStart = { x: grid.position.x, y: grid.position.y};
@@ -82,22 +83,18 @@
             console.log('Grid end: ',gridEnd);
 
             // Increment timer each frame
-            if(deltaTime)
-            {
-                t += deltaTime * 3;
-            }
+            timer.update(deltaTime);
 
             // Update position
             let pos;
-            if (t < 1) {
-                pos = lerp(gridStart, gridEnd, t);
+            if (timer.t < 1) {
+                pos = lerp(gridStart, gridEnd, timer.t);
             } else {
                 // Snap to the final position
                 pos = gridEnd;
-                // Update the player's cell reference
 
-
-                t = 0; // Reset t for the next segment
+                //t = 0; // Reset t for the next segment
+                timer.reset();
                 pathIndex++; // Move to the next segment
                 if (pathIndex >= pathManager.path.length - 1) {
                     pathManager.clearPath();
@@ -153,7 +150,8 @@
 
         // Calculate path from player to clicked cell
         pathIndex = 0;
-        t = 0;
+        //t = 0;
+        timer.reset();
         pathManager.setPath(astar(grid, player.cell, clickedCell));
         console.log('Path from: ', player.cell, ' to ', clickedCell);
     }
